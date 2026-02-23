@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WhatsApp Sticker Maker Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=JetBrains+Mono:wght@400;600&family=Pacifico&family=Oswald:wght@400;700&family=Bebas+Neue&family=Permanent+Marker&family=Bangers&family=Fredoka:wght@400;600;700&family=Righteous&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06090f;--surface:#0c1118;--surface2:#111821;--surface3:#18202e;
+  --text:#e8edf6;--text2:#8a97b0;--text3:#58657d;
+  --accent:#25d366;--accent2:#128c7e;
+  --orange:#ff9500;--red:#ff3b5c;--blue:#3b82f6;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);
+  --shadow:0 8px 32px rgba(0,0,0,.5);
+  --r:16px;--rs:10px;
+  --font:'DM Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);color:var(--text);background:var(--bg);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(800px 500px at 20% -5%,rgba(37,211,102,.1),transparent),radial-gradient(600px 400px at 85% 10%,rgba(18,140,126,.08),transparent);pointer-events:none;z-index:0}
+
+.app{position:relative;z-index:1;max-width:1220px;margin:0 auto;padding:16px 20px 40px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(37,211,102,.3)}
+.logo-text h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.logo-text p{font-size:11px;color:var(--text2);font-weight:500}
+.hbadges{display:flex;gap:6px;flex-wrap:wrap}
+.hb{font-size:10px;font-weight:600;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text2);display:flex;align-items:center;gap:5px}
+.hb .d{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.hb.anim .d{background:var(--orange);animation:pd 1.5s infinite}
+@keyframes pd{0%,100%{opacity:1}50%{opacity:.3}}
+
+.tabs{display:flex;gap:3px;padding:3px;background:var(--surface);border:1px solid var(--border);border-radius:13px;margin-bottom:14px;width:fit-content}
+.tab{padding:9px 18px;border-radius:10px;border:none;background:0;color:var(--text2);font-family:var(--font);font-size:12.5px;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:7px}
+.tab:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.tab.active{background:linear-gradient(135deg,rgba(37,211,102,.15),rgba(18,140,126,.12));color:var(--accent);box-shadow:0 2px 10px rgba(37,211,102,.12)}
+
+.mg{display:grid;grid-template-columns:1fr 370px;gap:14px}
+@media(max-width:1040px){.mg{grid-template-columns:1fr}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.ci{padding:16px}
+.ct{font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.7px}
+.ct .n{width:20px;height:20px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+.dz{border:2px dashed rgba(255,255,255,.1);border-radius:13px;padding:24px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:160px;cursor:pointer;transition:.25s;background:rgba(0,0,0,.12);text-align:center}
+.dz:hover{border-color:rgba(37,211,102,.35);background:rgba(37,211,102,.03)}
+.dz.dragover{border-color:var(--accent);background:rgba(37,211,102,.07)}
+.dz-i{font-size:32px;opacity:.6}
+.dz-t{font-size:13px;font-weight:650}
+.dz-h{font-size:11px;color:var(--text2);line-height:1.45;max-width:400px}
+.dz-a{display:flex;gap:7px;margin-top:3px}
+input[type=file]{display:none}
+
+.btn{border:1px solid var(--border2);background:var(--surface2);color:var(--text);padding:9px 14px;border-radius:var(--rs);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover:not(:disabled){transform:translateY(-1px);border-color:rgba(255,255,255,.18);box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.pri{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff;box-shadow:0 3px 16px rgba(37,211,102,.22)}
+.btn.pri:hover:not(:disabled){box-shadow:0 5px 24px rgba(37,211,102,.32)}
+.btn.dan{border-color:rgba(255,59,92,.25);color:var(--red)}
+.btn-s{padding:6px 10px;font-size:11px;border-radius:7px}
+
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.pg{grid-template-columns:1fr}}
+.pp{background:var(--surface2);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-bottom:1px solid var(--border);font-size:10px;color:var(--text2)}
+.ph strong{color:var(--text);font-size:11px}
+.pb{padding:8px}
+.ck{width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:linear-gradient(45deg,rgba(255,255,255,.04) 25%,transparent 25%) 0 0/14px 14px,linear-gradient(-45deg,rgba(255,255,255,.04) 25%,transparent 25%) 0 7px/14px 14px,linear-gradient(45deg,transparent 75%,rgba(255,255,255,.04) 75%) 7px -7px/14px 14px,linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.04) 75%) 7px 0/14px 14px,rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;position:relative}
+.ck img,.ck canvas,.ck video{width:100%;height:100%;object-fit:contain;display:block}
+.ck .plh{color:var(--text3);font-size:11px;font-weight:500}
+
+.ar{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.prg{width:100%;height:3px;border-radius:2px;background:var(--surface3);overflow:hidden;display:none;margin-top:6px}
+.prg.on{display:block}
+.prg .f{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s}
+
+.controls{display:grid;gap:8px}
+.fld{padding:12px;border:1px solid var(--border);border-radius:12px;background:rgba(0,0,0,.1)}
+.fl{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:6px}
+.fl strong{color:var(--text);font-weight:650}
+.fl .v{font-family:var(--mono);font-size:10px;color:var(--accent)}
+.fh{font-size:10px;color:var(--text3);line-height:1.4;margin-top:4px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:1040px){.fr{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.fr{grid-template-columns:1fr}}
+
+input[type=range]{width:100%;height:5px;-webkit-appearance:none;appearance:none;background:var(--surface3);border-radius:3px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(37,211,102,.35)}
+select,input[type=text],input[type=number]{width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--border2);background:var(--surface3);color:var(--text);font-family:var(--font);font-size:12px;outline:none}
+select:focus,input[type=text]:focus{border-color:var(--accent)}
+input[type=color]{width:100%;height:32px;padding:2px;border-radius:9px;border:1px solid var(--border2);background:var(--surface3);cursor:pointer}
+
+.sw{position:relative;width:36px;height:20px;display:inline-block}
+.sw input{opacity:0;width:0;height:0}
+.sw .sl{position:absolute;inset:0;border-radius:10px;background:var(--surface3);transition:.2s;cursor:pointer}
+.sw .sl::before{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:var(--text2);left:3px;bottom:3px;transition:.2s}
+.sw input:checked+.sl{background:var(--accent)}
+.sw input:checked+.sl::before{transform:translateX(16px);background:#fff}
+.tr{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tr label{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer}
+
+.sp{padding:12px;border:1px solid var(--border);border-radius:12px;background:rgba(0,0,0,.1);display:grid;gap:6px}
+.sln{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text2)}
+.sln strong{color:var(--text);font-family:var(--mono);font-size:10px}
+.pill{font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--mono);text-transform:uppercase}
+.pill.ok{border-color:rgba(37,211,102,.25);background:rgba(37,211,102,.08);color:#6ee7a0}
+.pill.bad{border-color:rgba(255,59,92,.25);background:rgba(255,59,92,.08);color:#ff8fa3}
+.pill.warn{border-color:rgba(255,149,0,.25);background:rgba(255,149,0,.08);color:#ffb84d}
+.plr{display:flex;gap:5px;flex-wrap:wrap}
+.ib{font-size:10.5px;color:var(--text2);line-height:1.45;padding:10px;border-radius:10px;background:rgba(37,211,102,.03);border:1px solid rgba(37,211,102,.08)}
+.ib strong{color:var(--text)}
+
+.sec-s,.sec-a{display:none}
+.sec-s.vis,.sec-a.vis{display:block}
+
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;display:none}
+.spinner.on{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TEXT OVERLAY EDITOR ── */
+.txt-panel{margin-top:12px}
+.txt-list{display:grid;gap:6px;margin-bottom:8px;max-height:320px;overflow-y:auto}
+.txt-item{padding:10px;border:1px solid var(--border);border-radius:10px;background:rgba(0,0,0,.1);display:grid;gap:6px;position:relative;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.txt-item .ti-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.txt-item .ti-head span{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+.txt-item .ti-remove{width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,59,92,.2);background:rgba(255,59,92,.08);color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.txt-item .ti-remove:hover{background:rgba(255,59,92,.2)}
+.txt-item input[type=text]{font-size:12px;padding:7px 9px}
+.txt-item .ti-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.txt-item .ti-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.txt-item .ti-row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
+.txt-item select{font-size:11px;padding:6px 8px}
+.txt-item input[type=range]{height:4px}
+.txt-item input[type=color]{height:28px}
+.ti-label{font-size:9.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.ti-style-btns{display:flex;gap:4px}
+.ti-style-btns button{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--surface3);color:var(--text2);font-size:12px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center}
+.ti-style-btns button.active{border-color:var(--accent);background:rgba(37,211,102,.12);color:var(--accent)}
+.ti-style-btns button:hover{border-color:rgba(255,255,255,.2)}
+.ti-pos{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ti-pos .ti-label{grid-column:1/-1}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">💬</div>
+    <div class="logo-text"><h1>WhatsApp Sticker Maker Pro</h1><p>Static &amp; Animated · Text overlays · Browser-based</p></div>
+  </div>
+  <div class="hbadges">
+    <div class="hb"><span class="d"></span>Static 512×512</div>
+    <div class="hb anim"><span class="d"></span>Animated 512×512</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-tab="static"><span>🖼️</span> Static Sticker</button>
+  <button class="tab" data-tab="animated"><span>🎞️</span> Animated Sticker</button>
+</div>
+
+<div class="mg">
+<div class="left-col">
+
+<!-- STATIC -->
+<div class="sec-s vis" id="secStatic">
+<div class="card"><div class="ci">
+  <div class="ct"><span class="n">1</span>Upload Image</div>
+  <input id="sFileIn" type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"/>
+  <div id="sDz" class="dz" tabindex="0">
+    <div class="dz-i">📎</div>
+    <div class="dz-t">Drop an image here or click to browse</div>
+    <div class="dz-h">PNG, JPG, GIF, or WEBP — transparent PNG recommended</div>
+    <div class="dz-a">
+      <button class="btn btn-s pri" id="sBrw">Browse files</button>
+      <button class="btn btn-s dan" id="sClr" disabled>Clear</button>
+    </div>
+  </div>
+  <div style="height:12px"></div>
+  <div class="ct"><span class="n">2</span>Preview</div>
+  <div class="pg">
+    <div class="pp"><div class="ph"><strong>Original</strong><span id="sOM">—</span></div><div class="pb"><div class="ck"><img id="sOI" alt=""/><span class="plh" id="sOP">No image</span></div></div></div>
+    <div class="pp"><div class="ph"><strong>Sticker Output</strong><span id="sXM">—</span></div><div class="pb"><div class="ck"><canvas id="sOC" width="512" height="512"></canvas></div></div></div>
+  </div>
+  <div class="prg" id="sPrg"><div class="f" id="sPF"></div></div>
+  <div class="ar">
+    <button class="btn pri" id="sGen" disabled><span class="spinner" id="sSp"></span>Generate Sticker</button>
+    <button class="btn" id="sShr" disabled>📲 Share to WhatsApp</button>
+    <button class="btn" id="sDl" disabled>⬇ Download .WEBP</button>
+  </div>
+</div></div>
+</div>
+
+<!-- ANIMATED -->
+<div class="sec-a" id="secAnim">
+<div class="card"><div class="ci">
+  <div class="ct"><span class="n">1</span>Upload GIF or Video</div>
+  <input id="aFileIn" type="file" accept="image/gif,video/mp4,video/webm"/>
+  <div id="aDz" class="dz" tabindex="0">
+    <div class="dz-i">🎬</div>
+    <div class="dz-t">Drop a GIF or short video here</div>
+    <div class="dz-h">GIF, MP4 or WEBM · Max 8 seconds · 512×512 ≤500KB</div>
+    <div class="dz-a">
+      <button class="btn btn-s pri" id="aBrw">Browse files</button>
+      <button class="btn btn-s dan" id="aClr" disabled>Clear</button>
+    </div>
+  </div>
+  <div style="height:12px"></div>
+  <div class="ct"><span class="n">2</span>Preview</div>
+  <div class="pg">
+    <div class="pp"><div class="ph"><strong>Original</strong><span id="aOM">—</span></div><div class="pb"><div class="ck"><img id="aOI" alt="" style="display:none"/><video id="aOV" muted loop playsinline style="display:none"></video><span class="plh" id="aOP">No file</span></div></div></div>
+    <div class="pp"><div class="ph"><strong>Animated Sticker</strong><span id="aXM">—</span></div><div class="pb"><div class="ck"><canvas id="aOC" width="512" height="512"></canvas><img id="aXI" alt="" style="display:none"/></div></div></div>
+  </div>
+  <div class="prg" id="aPrg"><div class="f" id="aPF"></div></div>
+  <div class="ar">
+    <button class="btn pri" id="aGen" disabled><span class="spinner" id="aSp"></span>Generate Animated Sticker</button>
+    <button class="btn" id="aShr" disabled>📲 Share to WhatsApp</button>
+    <button class="btn" id="aDl" disabled>⬇ Download .WEBP</button>
+  </div>
+  <div class="ib" style="margin-top:10px">
+    <strong>Animated stickers:</strong> Frames are extracted, processed at 512×512 with effects, then encoded as animated WEBP. Original GIF timing is preserved. All processing runs in your browser.
+  </div>
+</div></div>
+</div>
+
+</div><!-- left -->
+
+<!-- RIGHT COL -->
+<aside class="right-col">
+<div class="card"><div class="ci">
+  <div class="ct">⚙️ Sticker Settings</div>
+  <div class="controls">
+    <div class="fr">
+      <div class="fld">
+        <div class="fl"><strong>Padding</strong><span class="v" id="lP">24px</span></div>
+        <input id="cPad" type="range" min="0" max="100" value="24"/>
+      </div>
+      <div class="fld">
+        <div class="fl"><strong>Auto-Trim</strong></div>
+        <div class="tr"><label>Trim transparent edges</label><label class="sw"><input id="cTrim" type="checkbox" checked/><span class="sl"></span></label></div>
+        <div class="fh">Removes empty borders on PNGs.</div>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fld">
+        <div class="fl"><strong>Background</strong></div>
+        <select id="cBg"><option value="transparent" selected>Transparent</option><option value="solid">Solid color</option></select>
+        <input id="cBgC" type="color" value="#000000" style="margin-top:5px" disabled/>
+      </div>
+      <div class="fld">
+        <div class="fl"><strong>Max Size</strong><span class="v" id="lMK">100KB</span></div>
+        <input id="cMK" type="range" min="30" max="500" value="100"/>
+        <div class="fh sec-s vis" id="hS">Static: ≤100KB</div>
+        <div class="fh sec-a" id="hA">Animated: ≤500KB</div>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fld">
+        <div class="fl"><strong>Outline</strong><span class="v" id="lOW">10px</span></div>
+        <input id="cOW" type="range" min="0" max="24" value="10"/>
+        <input id="cOC" type="color" value="#ffffff" style="margin-top:5px"/>
+      </div>
+      <div class="fld">
+        <div class="fl"><strong>Shadow</strong><span class="v" id="lSB">6px</span></div>
+        <input id="cSB" type="range" min="0" max="24" value="6"/>
+        <input id="cSC" type="color" value="#000000" style="margin-top:5px"/>
+      </div>
+    </div>
+
+    <!-- Animated settings -->
+    <div class="sec-a" id="animS">
+      <div class="fld">
+        <div class="fl"><strong>Max Duration</strong><span class="v" id="lDur">8s</span></div>
+        <input id="cDur" type="range" min="1" max="8" value="8"/>
+        <div class="fh">Trims animation to this length. WhatsApp max: 8s.</div>
+      </div>
+      <div class="fld" style="margin-top:8px">
+        <div class="fl"><strong>Speed</strong><span class="v" id="lSpd">1.0×</span></div>
+        <input id="cSpd" type="range" min="25" max="300" value="100"/>
+        <div class="fh">Adjust playback speed. 1.0× = original speed.</div>
+      </div>
+      <div class="fld" style="margin-top:8px">
+        <div class="fl"><strong>Quality</strong><span class="v" id="lQ">70%</span></div>
+        <input id="cQ" type="range" min="10" max="95" value="70"/>
+        <div class="fh">Lower = smaller file.</div>
+      </div>
+    </div>
+
+    <!-- TEXT OVERLAYS -->
+    <div class="fld">
+      <div class="fl"><strong>📝 Text Overlays</strong><span class="v" id="lTxtCount">0</span></div>
+      <div class="txt-list" id="txtList"></div>
+      <button class="btn btn-s" id="txtAdd" style="width:100%;justify-content:center">+ Add Text</button>
+    </div>
+
+    <!-- Status -->
+    <div class="sp">
+      <div class="sln"><span>Input</span><strong id="stIn">No file</strong></div>
+      <div class="sln"><span>Output</span><strong id="stOut">—</strong></div>
+      <div class="sln"><span>Compliance</span><strong id="stCo">—</strong></div>
+      <div class="plr">
+        <span class="pill" id="plD">512×512</span>
+        <span class="pill" id="plS">—</span>
+        <span class="pill" id="plT">—</span>
+      </div>
+    </div>
+    <div class="ib">
+      <strong>📲 Share to WhatsApp</strong> uses your device's share sheet on mobile. On desktop, the file downloads — then attach it in WhatsApp and use "Create sticker".
+    </div>
+  </div>
+</div></div>
+</aside>
+</div>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const fmtB=b=>{if(!Number.isFinite(b))return'—';const k=b/1024;return k<1024?k.toFixed(1)+'KB':(k/1024).toFixed(2)+'MB'};
+
+// ── TABS ────────────────────────────────
+const tabs=document.querySelectorAll('.tab');
+const secS=document.querySelectorAll('.sec-s');
+const secA=document.querySelectorAll('.sec-a');
+let mode='static';
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');
+  mode=t.dataset.tab;
+  secS.forEach(s=>s.classList.toggle('vis',mode==='static'));
+  secA.forEach(s=>s.classList.toggle('vis',mode==='animated'));
+  if(mode==='animated'&&parseInt($('cMK').value)<200){$('cMK').value=500;uLabels()}
+  if(mode==='static'&&parseInt($('cMK').value)>300){$('cMK').value=100;uLabels()}
+}));
+
+// ── CONTROLS ────────────────────────────
+const cPad=$('cPad'),cTrim=$('cTrim'),cBg=$('cBg'),cBgC=$('cBgC'),cMK=$('cMK');
+const cOW=$('cOW'),cOC=$('cOC'),cSB=$('cSB'),cSC=$('cSC');
+const cDur=$('cDur'),cSpd=$('cSpd'),cQ=$('cQ');
+
+function uLabels(){
+  $('lP').textContent=cPad.value+'px';
+  $('lMK').textContent=cMK.value+'KB';
+  $('lOW').textContent=cOW.value+'px';
+  $('lSB').textContent=cSB.value+'px';
+  $('lDur').textContent=cDur.value+'s';
+  $('lSpd').textContent=(parseInt(cSpd.value)/100).toFixed(1)+'×';
+  $('lQ').textContent=cQ.value+'%';
+  cBgC.disabled=cBg.value!=='solid';
+}
+[cPad,cTrim,cBg,cBgC,cMK,cOW,cOC,cSB,cSC,cDur,cSpd,cQ].forEach(el=>el.addEventListener('input',()=>{uLabels();if(mode==='static'&&sImg)renderSP()}));
+uLabels();
+
+function setPl(el,t){el.classList.remove('ok','bad','warn');if(t)el.classList.add(t)}
+
+// ── TEXT OVERLAYS ───────────────────────
+const FONTS=['DM Sans','Pacifico','Oswald','Bebas Neue','Permanent Marker','Bangers','Fredoka','Righteous','Impact','Georgia','Courier New'];
+let textItems=[];
+let txtId=0;
+
+$('txtAdd').addEventListener('click',()=>{
+  const id=++txtId;
+  textItems.push({id,text:'Sticker',font:'Bangers',size:60,color:'#ffffff',strokeColor:'#000000',strokeW:3,bold:false,italic:false,x:256,y:440,rotation:0});
+  renderTextList();
+  if(mode==='static'&&sImg)renderSP();
+});
+
+function renderTextList(){
+  const list=$('txtList');
+  list.innerHTML='';
+  $('lTxtCount').textContent=textItems.length;
+  textItems.forEach((t,idx)=>{
+    const d=document.createElement('div');d.className='txt-item';
+    d.innerHTML=`
+      <div class="ti-head"><span>Text #${idx+1}</span><button class="ti-remove" data-id="${t.id}">✕</button></div>
+      <input type="text" value="${esc(t.text)}" data-id="${t.id}" data-f="text" placeholder="Enter text..."/>
+      <div class="ti-row">
+        <div><div class="ti-label">Font</div><select data-id="${t.id}" data-f="font">${FONTS.map(f=>`<option value="${f}"${f===t.font?' selected':''}>${f}</option>`).join('')}</select></div>
+        <div><div class="ti-label">Size</div><input type="range" min="16" max="120" value="${t.size}" data-id="${t.id}" data-f="size"/></div>
+      </div>
+      <div class="ti-row3">
+        <div><div class="ti-label">Color</div><input type="color" value="${t.color}" data-id="${t.id}" data-f="color"/></div>
+        <div><div class="ti-label">Stroke</div><input type="color" value="${t.strokeColor}" data-id="${t.id}" data-f="strokeColor"/></div>
+        <div><div class="ti-label">Stroke W</div><input type="range" min="0" max="12" value="${t.strokeW}" data-id="${t.id}" data-f="strokeW"/></div>
+      </div>
+      <div class="ti-row3">
+        <div class="ti-style-btns">
+          <button data-id="${t.id}" data-f="bold" class="${t.bold?'active':''}"><b>B</b></button>
+          <button data-id="${t.id}" data-f="italic" class="${t.italic?'active':''}"><i>I</i></button>
+        </div>
+        <div><div class="ti-label">Rotation</div><input type="range" min="-180" max="180" value="${t.rotation}" data-id="${t.id}" data-f="rotation"/></div>
+        <div></div>
+      </div>
+      <div class="ti-pos">
+        <div class="ti-label">Position (drag values)</div>
+        <div><div class="ti-label">X: ${t.x}</div><input type="range" min="0" max="512" value="${t.x}" data-id="${t.id}" data-f="x"/></div>
+        <div><div class="ti-label">Y: ${t.y}</div><input type="range" min="0" max="512" value="${t.y}" data-id="${t.id}" data-f="y"/></div>
+      </div>
+    `;
+    list.appendChild(d);
+  });
+
+  // Bind events
+  list.querySelectorAll('.ti-remove').forEach(b=>b.addEventListener('click',()=>{
+    textItems=textItems.filter(t=>t.id!==+b.dataset.id);
+    renderTextList();if(mode==='static'&&sImg)renderSP();
+  }));
+  list.querySelectorAll('input[data-f],select[data-f]').forEach(el=>{
+    el.addEventListener('input',()=>{
+      const item=textItems.find(t=>t.id===+el.dataset.id);if(!item)return;
+      const f=el.dataset.f;
+      if(f==='size'||f==='strokeW'||f==='x'||f==='y'||f==='rotation')item[f]=+el.value;
+      else item[f]=el.value;
+      // Update labels in position
+      const parent=el.closest('.ti-pos,.ti-row,.ti-row3');
+      if(parent){const lbl=el.parentElement.querySelector('.ti-label');if(lbl&&(f==='x'||f==='y'))lbl.textContent=f.toUpperCase()+': '+el.value}
+      if(mode==='static'&&sImg)renderSP();
+    });
+  });
+  list.querySelectorAll('.ti-style-btns button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const item=textItems.find(t=>t.id===+b.dataset.id);if(!item)return;
+      item[b.dataset.f]=!item[b.dataset.f];
+      b.classList.toggle('active');
+      if(mode==='static'&&sImg)renderSP();
+    });
+  });
+}
+
+function esc(s){return s.replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+
+function drawTexts(ctx,size=512){
+  textItems.forEach(t=>{
+    if(!t.text)return;
+    ctx.save();
+    ctx.translate(t.x,t.y);
+    if(t.rotation)ctx.rotate(t.rotation*Math.PI/180);
+    const style=`${t.italic?'italic ':' '}${t.bold?'bold ':' '}${t.size}px '${t.font}', sans-serif`;
+    ctx.font=style;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    if(t.strokeW>0){ctx.strokeStyle=t.strokeColor;ctx.lineWidth=t.strokeW*2;ctx.lineJoin='round';ctx.miterLimit=2;ctx.strokeText(t.text,0,0)}
+    ctx.fillStyle=t.color;ctx.fillText(t.text,0,0);
+    ctx.restore();
+  });
+}
+
+// ── CROP BOX ────────────────────────────
+function cropBox(img){
+  const mx=1024,iw=img.naturalWidth,ih=img.naturalHeight;
+  const sc=Math.min(1,mx/Math.max(iw,ih));
+  const aw=Math.max(1,Math.round(iw*sc)),ah=Math.max(1,Math.round(ih*sc));
+  const c=document.createElement('canvas');c.width=aw;c.height=ah;
+  const ctx=c.getContext('2d',{willReadFrequently:true});
+  ctx.clearRect(0,0,aw,ah);ctx.drawImage(img,0,0,aw,ah);
+  let d;try{d=ctx.getImageData(0,0,aw,ah).data}catch{return null}
+  let x0=aw,y0=ah,x1=-1,y1=-1,ha=false;
+  for(let y=0;y<ah;y++)for(let x=0;x<aw;x++){const a=d[(y*aw+x)*4+3];if(a<255)ha=true;if(a>8){if(x<x0)x0=x;if(y<y0)y0=y;if(x>x1)x1=x;if(y>y1)y1=y}}
+  if(!ha||x1<0)return null;
+  const p=2;x0=clamp(x0-p,0,aw-1);y0=clamp(y0-p,0,ah-1);x1=clamp(x1+p,0,aw-1);y1=clamp(y1+p,0,ah-1);
+  const inv=1/sc;
+  return{sx:clamp(Math.round(x0*inv),0,iw-1),sy:clamp(Math.round(y0*inv),0,ih-1),sw:clamp(Math.round((x1-x0+1)*inv),1,iw),sh:clamp(Math.round((y1-y0+1)*inv),1,ih)};
+}
+
+// ── BUILD FRAME ─────────────────────────
+function buildFrame(src,sz=512,skipText=false){
+  const pad=parseInt(cPad.value),ow=parseInt(cOW.value),sb=parseInt(cSB.value);
+  const oc=cOC.value,sc2=cSC.value,bgm=cBg.value,bgc=cBgC.value;
+  let sw,sh;
+  if(src instanceof HTMLCanvasElement){sw=src.width;sh=src.height}
+  else{sw=src.naturalWidth||src.width;sh=src.naturalHeight||src.height}
+
+  const il=document.createElement('canvas');il.width=sz;il.height=sz;
+  const ic=il.getContext('2d');ic.clearRect(0,0,sz,sz);
+  ic.imageSmoothingEnabled=true;ic.imageSmoothingQuality='high';
+  const ct=Math.max(1,sz-2*pad),s=Math.min(ct/sw,ct/sh);
+  const dw=Math.round(sw*s),dh=Math.round(sh*s);
+  const dx=Math.round((sz-dw)/2),dy=Math.round((sz-dh)/2);
+  ic.drawImage(src,0,0,sw,sh,dx,dy,dw,dh);
+
+  const sil=document.createElement('canvas');sil.width=sz;sil.height=sz;
+  const sx=sil.getContext('2d');sx.drawImage(il,0,0);sx.globalCompositeOperation='source-in';sx.fillStyle=oc;sx.fillRect(0,0,sz,sz);
+
+  const out=document.createElement('canvas');out.width=sz;out.height=sz;
+  const ctx=out.getContext('2d');ctx.clearRect(0,0,sz,sz);
+  if(bgm==='solid'){ctx.fillStyle=bgc;ctx.fillRect(0,0,sz,sz)}
+
+  if(sb>0){
+    ctx.save();ctx.filter=`blur(${sb}px)`;ctx.globalAlpha=.3;
+    const ss=document.createElement('canvas');ss.width=sz;ss.height=sz;
+    const sc3=ss.getContext('2d');sc3.drawImage(il,0,0);sc3.globalCompositeOperation='source-in';sc3.fillStyle=sc2;sc3.fillRect(0,0,sz,sz);
+    ctx.drawImage(ss,4,7);ctx.restore();
+  }
+  if(ow>0){
+    const st=clamp(Math.round(ow*6),16,96);ctx.save();
+    for(let i=0;i<st;i++){const a=(i/st)*Math.PI*2;ctx.drawImage(sil,Math.cos(a)*ow,Math.sin(a)*ow)}
+    ctx.restore();
+  }
+  ctx.drawImage(il,0,0);
+  if(!skipText&&textItems.length>0)drawTexts(ctx,sz);
+  return out;
+}
+
+// ═══ STATIC STICKER ═════════════════════
+let sFile=null,sImg=null,sWB=null,sPB=null,sSD=null;
+const sOC=$('sOC'),sOX=sOC.getContext('2d');
+
+function sReset(){sOX.clearRect(0,0,512,512);sWB=sPB=sSD=null;$('sXM').textContent='—';$('stOut').textContent='—';$('stCo').textContent='—';$('plS').textContent='—';$('plT').textContent='—';setPl($('plS'),null);setPl($('plT'),null);$('sDl').disabled=$('sShr').disabled=true}
+
+$('sBrw').addEventListener('click',()=>$('sFileIn').click());
+$('sDz').addEventListener('click',()=>$('sFileIn').click());
+['dragenter','dragover'].forEach(e=>$('sDz').addEventListener(e,ev=>{ev.preventDefault();$('sDz').classList.add('dragover')}));
+['dragleave','drop'].forEach(e=>$('sDz').addEventListener(e,ev=>{ev.preventDefault();$('sDz').classList.remove('dragover')}));
+$('sDz').addEventListener('drop',e=>{if(e.dataTransfer.files[0])sLoad(e.dataTransfer.files[0])});
+$('sFileIn').addEventListener('change',()=>{if($('sFileIn').files[0])sLoad($('sFileIn').files[0])});
+$('sClr').addEventListener('click',()=>{sFile=sImg=null;$('sOI').removeAttribute('src');$('sOP').style.display='';$('sOM').textContent='—';$('stIn').textContent='No file';$('sClr').disabled=$('sGen').disabled=true;$('sFileIn').value='';sReset()});
+
+function sLoad(f){
+  if(!/^image\//i.test(f.type)&&!/\.(png|jpe?g|gif|webp)$/i.test(f.name)){alert('Use PNG, JPG, GIF, or WEBP.');return}
+  sFile=f;$('sClr').disabled=false;$('sGen').disabled=false;
+  $('stIn').textContent=`${f.name} (${fmtB(f.size)})`;$('sOP').style.display='none';
+  const u=URL.createObjectURL(f);$('sOI').src=u;
+  const img=new Image();img.onload=()=>{sImg=img;$('sOM').textContent=img.naturalWidth+'×'+img.naturalHeight;renderSP();sReset()};
+  img.onerror=()=>alert('Cannot read image.');img.src=u;
+}
+
+function renderSP(){
+  if(!sImg)return;
+  let src=sImg;
+  if(cTrim.checked){const c=cropBox(sImg);if(c){const t=document.createElement('canvas');t.width=c.sw;t.height=c.sh;t.getContext('2d').drawImage(sImg,c.sx,c.sy,c.sw,c.sh,0,0,c.sw,c.sh);src=t}}
+  const out=buildFrame(src);sOX.clearRect(0,0,512,512);sOX.drawImage(out,0,0);
+}
+
+function c2b(c,t,q){return new Promise(r=>c.toBlob(b=>r(b),t,q))}
+
+async function expWO(c,mx){
+  const qs=[];for(let q=.95;q>=.12;q-=.04)qs.push(+q.toFixed(2));
+  let b=null,bq=null;
+  for(const q of qs){const bl=await c2b(c,'image/webp',q);if(!bl)return{blob:null,q:null};b=bl;bq=q;if(bl.size<=mx)return{blob:bl,q,ok:true}}
+  return{blob:b,q:bq,ok:false};
+}
+
+$('sGen').addEventListener('click',async()=>{
+  if(!sImg)return;
+  $('sGen').disabled=true;$('sSp').classList.add('on');
+  $('sPrg').classList.add('on');$('sPF').style.width='20%';
+  renderSP();
+  const c=document.createElement('canvas');c.width=512;c.height=512;c.getContext('2d').drawImage(sOC,0,0);
+  const mx=parseInt(cMK.value)*1024;
+  sPB=await c2b(c,'image/png',1);$('sPF').style.width='50%';
+  const r=await expWO(c,mx);$('sPF').style.width='100%';
+  if(r.blob){
+    sWB=r.blob;const ok=r.blob.size<=mx;
+    $('sXM').textContent=`512×512 · ${fmtB(r.blob.size)} · q=${r.q}`;
+    $('stOut').textContent=`WEBP (${fmtB(r.blob.size)})`;
+    $('stCo').textContent=ok?'✓ Compliant':'⚠ Over target';
+    $('plS').textContent=fmtB(r.blob.size);$('plT').textContent='WEBP';
+    setPl($('plT'),'ok');setPl($('plS'),ok?'ok':'warn');
+    $('sDl').disabled=false;
+    const bn=(sFile?.name||'sticker').replace(/\.[^.]+$/,'');
+    sSD={blob:sWB,type:'image/webp',fn:`${bn}_sticker.webp`};$('sShr').disabled=false;
+  }else{
+    $('stOut').textContent='WebP not supported — PNG';$('plT').textContent='PNG';setPl($('plT'),'warn');
+    if(sPB){const bn=(sFile?.name||'sticker').replace(/\.[^.]+$/,'');sSD={blob:sPB,type:'image/png',fn:`${bn}_sticker.png`};$('sShr').disabled=false;$('sDl').disabled=false;sWB=sPB}
+  }
+  setTimeout(()=>$('sPrg').classList.remove('on'),400);
+  $('sGen').disabled=false;$('sSp').classList.remove('on');
+});
+
+$('sDl').addEventListener('click',()=>{if(sWB)dlBlob(sWB,(sFile?.name||'sticker').replace(/\.[^.]+$/,'')+'_sticker.webp')});
+$('sShr').addEventListener('click',()=>share(sSD));
+
+// ═══ GIF DECODER ════════════════════════
+class GD{
+  constructor(buf){this.d=new Uint8Array(buf);this.p=0;this.frames=[]}
+  rb(){return this.d[this.p++]}
+  r16(){const v=this.d[this.p]|(this.d[this.p+1]<<8);this.p+=2;return v}
+  rn(n){const s=this.d.slice(this.p,this.p+n);this.p+=n;return s}
+  skip(){while(true){const s=this.rb();if(!s)break;this.p+=s}}
+  rsub(){const ch=[];while(true){const s=this.rb();if(!s)break;ch.push(this.rn(s))}let t=0;for(const c of ch)t+=c.length;const o=new Uint8Array(t);let off=0;for(const c of ch){o.set(c,off);off+=c.length}return o}
+
+  decode(){
+    const sig=String.fromCharCode(...this.rn(6));if(!sig.startsWith('GIF'))throw new Error('Not GIF');
+    this.w=this.r16();this.h=this.r16();
+    const pk=this.rb();this.bgI=this.rb();this.rb();
+    const gf=(pk>>7)&1,gs=1<<((pk&7)+1);
+    this.gct=gf?this.rn(gs*3):null;
+    const fc=document.createElement('canvas');fc.width=this.w;fc.height=this.h;
+    const fx=fc.getContext('2d');
+    let delay=100,disp=0,ti=-1;
+
+    while(this.p<this.d.length){
+      const b=this.rb();
+      if(b===0x3B)break;
+      if(b===0x21){
+        const l=this.rb();
+        if(l===0xF9){this.rb();const gp=this.rb();delay=this.r16()*10;if(delay<20)delay=100;ti=(gp&1)?this.rb():(this.rb(),-1);disp=(gp>>2)&7;this.rb()}
+        else this.skip();continue;
+      }
+      if(b===0x2C){
+        const left=this.r16(),top=this.r16(),w=this.r16(),h=this.r16();
+        const ip=this.rb(),lf=(ip>>7)&1,ls=1<<((ip&7)+1);
+        let ct=this.gct;if(lf)ct=this.rn(ls*3);
+        const mcs=this.rb(),lzw=this.rsub(),px=this.lzw(mcs,lzw,w*h);
+        let prev=null;if(disp===3)prev=fx.getImageData(0,0,this.w,this.h);
+        const id=fx.getImageData(left,top,w,h);
+        for(let i=0;i<px.length;i++){const ci=px[i];if(ci===ti)continue;id.data[i*4]=ct[ci*3];id.data[i*4+1]=ct[ci*3+1];id.data[i*4+2]=ct[ci*3+2];id.data[i*4+3]=255}
+        fx.putImageData(id,left,top);
+        const fr=document.createElement('canvas');fr.width=this.w;fr.height=this.h;fr.getContext('2d').drawImage(fc,0,0);
+        this.frames.push({canvas:fr,delay});
+        if(disp===2)fx.clearRect(left,top,w,h);
+        else if(disp===3&&prev)fx.putImageData(prev,0,0);
+        ti=-1;disp=0;continue;
+      }
+    }
+    return this.frames;
+  }
+
+  lzw(mcs,data,pc){
+    const cl=1<<mcs,eoi=cl+1;let cs=mcs+1,cm=(1<<cs)-1,nc=eoi+1;
+    const MX=4096,pf=new Int16Array(MX),sf=new Uint8Array(MX),ln=new Uint16Array(MX);
+    function init(){for(let i=0;i<cl;i++){pf[i]=-1;sf[i]=i;ln[i]=1}nc=eoi+1;cs=mcs+1;cm=(1<<cs)-1}
+    init();
+    const out=new Uint8Array(pc);let op=0,bb=0,bc=0,dp=0;
+    function rc(){while(bc<cs){if(dp>=data.length)return-1;bb|=data[dp++]<<bc;bc+=8}const c=bb&cm;bb>>=cs;bc-=cs;return c}
+    function oc(code){const l=ln[code];let c=code;for(let i=l-1;i>=0;i--){out[op+i]=sf[c];c=pf[c]}op+=l}
+    let prev=-1;
+    while(op<pc){const code=rc();if(code===-1||code===eoi)break;if(code===cl){init();prev=-1;continue}
+      if(prev===-1){oc(code);prev=code;continue}
+      if(code<nc){oc(code);if(nc<MX){pf[nc]=prev;let c=code;while(pf[c]!==-1)c=pf[c];sf[nc]=sf[c];ln[nc]=ln[prev]+1;nc++}}
+      else{if(nc<MX){pf[nc]=prev;let c=prev;while(pf[c]!==-1)c=pf[c];sf[nc]=sf[c];ln[nc]=ln[prev]+1;nc++}oc(code)}
+      if(nc>cm&&cs<12){cs++;cm=(1<<cs)-1}prev=code;
+    }
+    return out;
+  }
+}
+
+// ═══ VIDEO FRAMES ═══════════════════════
+async function vidFrames(file,maxDur){
+  return new Promise((res,rej)=>{
+    const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';
+    const u=URL.createObjectURL(file);v.src=u;
+    v.onloadedmetadata=async()=>{
+      const dur=Math.min(v.duration,maxDur);
+      // Extract at ~15fps for video, user controls speed separately
+      const fps=15;const interval=1/fps;const frames=[];let t=0;
+      const seek=t2=>new Promise(r=>{v.onseeked=()=>r();v.currentTime=t2});
+      while(t<dur){await seek(t);const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);frames.push({canvas:c,delay:Math.round(interval*1000)});t+=interval}
+      URL.revokeObjectURL(u);res(frames);
+    };
+    v.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('Video load failed'))};
+  });
+}
+
+// ═══ ANIMATED WEBP ENCODER ══════════════
+class AWE{
+  constructor(w,h,loop=0){this.w=w;this.h=h;this.loop=loop;this.fbs=[]}
+  async add(canvas,dur_ms,quality){
+    const bl=await new Promise(r=>canvas.toBlob(b=>r(b),'image/webp',quality/100));
+    if(!bl)throw new Error('WebP not supported');
+    this.fbs.push({data:new Uint8Array(await bl.arrayBuffer()),dur:dur_ms});
+  }
+  build(){
+    const frames=this.fbs.map(f=>{
+      const d=f.data;
+      if(String.fromCharCode(d[0],d[1],d[2],d[3])!=='RIFF')throw new Error('Bad frame');
+      if(String.fromCharCode(d[8],d[9],d[10],d[11])!=='WEBP')throw new Error('Bad frame');
+      let p=12,vp=null;
+      while(p<d.length){
+        const cc=String.fromCharCode(d[p],d[p+1],d[p+2],d[p+3]);
+        const sz=d[p+4]|(d[p+5]<<8)|(d[p+6]<<16)|(d[p+7]<<24);
+        if(cc==='VP8 '||cc==='VP8L'){vp={fcc:cc,data:d.slice(p+8,p+8+sz)};break}
+        p+=8+sz+(sz&1);
+      }
+      if(!vp)throw new Error('No VP8');
+      return{...vp,dur:f.dur};
+    });
+
+    const anmfs=frames.map(fr=>{
+      const subSz=8+fr.data.length+(fr.data.length&1);
+      const plSz=16+subSz;
+      const buf=new Uint8Array(8+plSz+(plSz&1));
+      const dv=new DataView(buf.buffer);
+      buf[0]=0x41;buf[1]=0x4E;buf[2]=0x4D;buf[3]=0x46;
+      dv.setUint32(4,plSz,true);
+      buf[8]=buf[9]=buf[10]=buf[11]=buf[12]=buf[13]=0;
+      const w1=this.w-1;buf[14]=w1&0xFF;buf[15]=(w1>>8)&0xFF;buf[16]=(w1>>16)&0xFF;
+      const h1=this.h-1;buf[17]=h1&0xFF;buf[18]=(h1>>8)&0xFF;buf[19]=(h1>>16)&0xFF;
+      buf[20]=fr.dur&0xFF;buf[21]=(fr.dur>>8)&0xFF;buf[22]=(fr.dur>>16)&0xFF;
+      buf[23]=0x02;
+      buf[24]=fr.fcc.charCodeAt(0);buf[25]=fr.fcc.charCodeAt(1);buf[26]=fr.fcc.charCodeAt(2);buf[27]=fr.fcc.charCodeAt(3);
+      dv.setUint32(28,fr.data.length,true);
+      buf.set(fr.data,32);
+      return buf;
+    });
+
+    const animCh=new Uint8Array(14);
+    animCh[0]=0x41;animCh[1]=0x4E;animCh[2]=0x49;animCh[3]=0x4D;
+    new DataView(animCh.buffer).setUint32(4,6,true);
+    new DataView(animCh.buffer).setUint32(8,0,true);
+    new DataView(animCh.buffer).setUint16(12,this.loop,true);
+
+    const vp8x=new Uint8Array(18);
+    vp8x[0]=0x56;vp8x[1]=0x50;vp8x[2]=0x38;vp8x[3]=0x58;
+    new DataView(vp8x.buffer).setUint32(4,10,true);
+    vp8x[8]=0x02;vp8x[9]=vp8x[10]=vp8x[11]=0;
+    const cw=this.w-1;vp8x[12]=cw&0xFF;vp8x[13]=(cw>>8)&0xFF;vp8x[14]=(cw>>16)&0xFF;
+    const ch=this.h-1;vp8x[15]=ch&0xFF;vp8x[16]=(ch>>8)&0xFF;vp8x[17]=(ch>>16)&0xFF;
+
+    let tp=vp8x.length+animCh.length;for(const a of anmfs)tp+=a.length;
+    const fs=4+tp;
+    const riff=new Uint8Array(8+fs);
+    const rv=new DataView(riff.buffer);
+    riff[0]=0x52;riff[1]=0x49;riff[2]=0x46;riff[3]=0x46;
+    rv.setUint32(4,fs,true);
+    riff[8]=0x57;riff[9]=0x45;riff[10]=0x42;riff[11]=0x50;
+    let o=12;riff.set(vp8x,o);o+=vp8x.length;riff.set(animCh,o);o+=animCh.length;
+    for(const a of anmfs){riff.set(a,o);o+=a.length}
+    return new Blob([riff],{type:'image/webp'});
+  }
+}
+
+// ═══ ANIMATED STICKER ═══════════════════
+let aFile=null,aIsGif=false,aWB=null,aSD=null;
+const aOC=$('aOC'),aOX=aOC.getContext('2d');
+
+function aReset(){aOX.clearRect(0,0,512,512);aWB=aSD=null;$('aXM').textContent='—';$('stOut').textContent='—';$('stCo').textContent='—';$('plS').textContent='—';$('plT').textContent='—';setPl($('plS'),null);setPl($('plT'),null);$('aDl').disabled=$('aShr').disabled=true;$('aXI').style.display='none';aOC.style.display=''}
+
+$('aBrw').addEventListener('click',()=>$('aFileIn').click());
+$('aDz').addEventListener('click',()=>$('aFileIn').click());
+['dragenter','dragover'].forEach(e=>$('aDz').addEventListener(e,ev=>{ev.preventDefault();$('aDz').classList.add('dragover')}));
+['dragleave','drop'].forEach(e=>$('aDz').addEventListener(e,ev=>{ev.preventDefault();$('aDz').classList.remove('dragover')}));
+$('aDz').addEventListener('drop',e=>{if(e.dataTransfer.files[0])aLoad(e.dataTransfer.files[0])});
+$('aFileIn').addEventListener('change',()=>{if($('aFileIn').files[0])aLoad($('aFileIn').files[0])});
+$('aClr').addEventListener('click',()=>{aFile=null;$('aOI').style.display='none';$('aOI').removeAttribute('src');$('aOV').style.display='none';$('aOV').removeAttribute('src');$('aOP').style.display='';$('aOM').textContent='—';$('stIn').textContent='No file';$('aClr').disabled=$('aGen').disabled=true;$('aFileIn').value='';aReset()});
+
+function aLoad(f){
+  const ig=f.type==='image/gif'||/\.gif$/i.test(f.name);
+  const iv=/^video\/(mp4|webm)$/.test(f.type)||/\.(mp4|webm)$/i.test(f.name);
+  if(!ig&&!iv){alert('Use GIF, MP4, or WEBM.');return}
+  aFile=f;aIsGif=ig;$('aClr').disabled=false;$('aGen').disabled=false;
+  $('stIn').textContent=`${f.name} (${fmtB(f.size)})`;$('aOP').style.display='none';
+  const u=URL.createObjectURL(f);
+  if(ig){$('aOI').src=u;$('aOI').style.display='block';$('aOV').style.display='none';$('aOM').textContent='GIF'}
+  else{$('aOV').src=u;$('aOV').style.display='block';$('aOI').style.display='none';$('aOV').play();$('aOV').onloadedmetadata=()=>{$('aOM').textContent=`${$('aOV').videoWidth}×${$('aOV').videoHeight} · ${$('aOV').duration.toFixed(1)}s`}}
+  aReset();
+}
+
+$('aGen').addEventListener('click',async()=>{
+  if(!aFile)return;
+  $('aGen').disabled=true;$('aSp').classList.add('on');
+  $('aPrg').classList.add('on');$('aPF').style.width='5%';
+
+  try{
+    const maxDur=parseInt(cDur.value);
+    const speedMult=parseInt(cSpd.value)/100; // >1 = faster
+    const quality=parseInt(cQ.value);
+    const maxBytes=parseInt(cMK.value)*1024;
+
+    $('stOut').textContent='Extracting frames…';$('aPF').style.width='10%';
+
+    let rawFrames;
+    if(aIsGif){
+      const buf=await aFile.arrayBuffer();
+      const dec=new GD(buf);
+      rawFrames=dec.decode();
+      if(!rawFrames.length)throw new Error('No frames found');
+    }else{
+      rawFrames=await vidFrames(aFile,maxDur);
+      if(!rawFrames.length)throw new Error('No frames extracted');
+    }
+    $('aPF').style.width='25%';
+    $('stOut').textContent=rawFrames.length+' frames extracted';
+
+    // Apply speed multiplier to delays
+    // speedMult>1 => shorter delays (faster), <1 => longer (slower)
+    let frames=rawFrames.map(f=>({canvas:f.canvas,delay:Math.max(20,Math.round(f.delay/speedMult))}));
+
+    // Trim to maxDuration using cumulative delay
+    let cumDelay=0;const maxMs=maxDur*1000;
+    const trimmed=[];
+    for(const f of frames){
+      if(cumDelay>=maxMs)break;
+      trimmed.push(f);
+      cumDelay+=f.delay;
+    }
+    frames=trimmed;
+
+    // If too many frames (>150), sample down to reduce processing
+    if(frames.length>150){
+      const step=frames.length/150;const sampled=[];
+      for(let i=0;i<150;i++){
+        const idx=Math.min(Math.round(i*step),frames.length-1);
+        sampled.push(frames[idx]);
+      }
+      frames=sampled;
+    }
+
+    $('stOut').textContent=`Processing ${frames.length} frames…`;$('aPF').style.width='30%';
+
+    const processed=[];
+    for(let i=0;i<frames.length;i++){
+      const out=buildFrame(frames[i].canvas);
+      processed.push({canvas:out,delay:frames[i].delay});
+      if(i%5===0){
+        $('aPF').style.width=(30+(i/frames.length)*35)+'%';
+        aOX.clearRect(0,0,512,512);aOX.drawImage(out,0,0);
+        await new Promise(r=>setTimeout(r,0));
+      }
+    }
+
+    $('aPF').style.width='65%';$('stOut').textContent='Encoding animated WebP…';
+
+    // Encode with per-frame delays
+    const enc=new AWE(512,512,0);
+    for(let i=0;i<processed.length;i++){
+      await enc.add(processed[i].canvas,processed[i].delay,quality);
+      if(i%3===0){$('aPF').style.width=(65+(i/processed.length)*25)+'%';await new Promise(r=>setTimeout(r,0))}
+    }
+    $('aPF').style.width='92%';
+    let blob=enc.build();
+
+    // Auto-optimize if over size
+    if(blob.size>maxBytes){
+      $('stOut').textContent='Optimizing file size…';
+      // Try lower quality
+      for(let q=quality-15;q>=15;q-=15){
+        const e2=new AWE(512,512,0);
+        for(const pf of processed)await e2.add(pf.canvas,pf.delay,q);
+        blob=e2.build();if(blob.size<=maxBytes)break;
+      }
+      // Try halving frames
+      if(blob.size>maxBytes&&processed.length>8){
+        const half=[];for(let i=0;i<processed.length;i+=2)half.push({canvas:processed[i].canvas,delay:processed[i].delay*2});
+        const e3=new AWE(512,512,0);
+        for(const pf of half)await e3.add(pf.canvas,pf.delay,15);
+        blob=e3.build();
+      }
+    }
+
+    $('aPF').style.width='100%';
+    aWB=blob;const ok=blob.size<=maxBytes;
+    const totalDur=(frames.reduce((s,f)=>s+f.delay,0)/1000).toFixed(1);
+
+    $('aXM').textContent=`512×512 · ${frames.length}f · ${totalDur}s · ${fmtB(blob.size)}`;
+    $('stOut').textContent=`Animated WEBP (${fmtB(blob.size)})`;
+    $('stCo').textContent=ok?'✓ Compliant':'⚠ Over target';
+    $('plS').textContent=fmtB(blob.size);$('plT').textContent='AWEBP';
+    setPl($('plT'),'ok');setPl($('plS'),ok?'ok':'warn');
+
+    const pu=URL.createObjectURL(blob);$('aXI').src=pu;$('aXI').style.display='block';aOC.style.display='none';
+
+    const bn=(aFile?.name||'sticker').replace(/\.[^.]+$/,'');
+    aSD={blob,type:'image/webp',fn:`${bn}_animated_sticker.webp`};
+    $('aDl').disabled=false;$('aShr').disabled=false;
+
+  }catch(err){
+    console.error(err);$('stOut').textContent='Error: '+err.message;$('stCo').textContent='✗ Failed';
+    alert('Error: '+err.message);
+  }
+  setTimeout(()=>$('aPrg').classList.remove('on'),400);
+  $('aGen').disabled=false;$('aSp').classList.remove('on');
+});
+
+$('aDl').addEventListener('click',()=>{if(aWB)dlBlob(aWB,(aFile?.name||'sticker').replace(/\.[^.]+$/,'')+'_animated_sticker.webp')});
+$('aShr').addEventListener('click',()=>share(aSD));
+
+// ═══ SHARED UTILS ═══════════════════════
+function dlBlob(blob,fn){
+  const u=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=u;a.download=fn;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(u),2000);
+}
+
+async function share(sd){
+  if(!sd?.blob){alert('Generate the sticker first.');return}
+  const file=new File([sd.blob],sd.fn,{type:sd.type});
+
+  // Try native share (mobile)
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){
+      await navigator.share({files:[file],title:'WhatsApp Sticker',text:'Send as sticker in WhatsApp!'});
+      return;
+    }
+  }catch(e){if(String(e).toLowerCase().includes('abort'))return;console.warn(e)}
+
+  // Fallback: download + open WhatsApp
+  dlBlob(sd.blob,sd.fn);
+
+  // Try WhatsApp deep link
+  const isMobile=/Android|iPhone|iPad/i.test(navigator.userAgent);
+  if(isMobile){
+    // On mobile, try to open WhatsApp directly
+    window.location.href='whatsapp://';
+    setTimeout(()=>{
+      alert('File downloaded! Open WhatsApp → open any chat → tap 📎 → select the downloaded file → long-press the sent image → "Add to stickers"');
+    },1500);
+  }else{
+    alert('File downloaded!\n\n1. Open WhatsApp (Web or Desktop)\n2. Open any chat\n3. Attach the downloaded .webp file\n4. After sending, long-press the sticker image\n5. Choose "Add to stickers" (if available)\n\nOr use a sticker maker app to import the file.');
+  }
+}
+
+})();
+</script>
+</body>
+</html>
